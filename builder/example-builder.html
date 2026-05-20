@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Form Schema Builder — Ví dụ thiết lập Schema</title>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Builder + Renderer -->
+  <script src="form-builder.js"></script>
+  <script src="/renderer/form-renderer.js"></script>
+
+  <!-- Plugin CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 32px 24px;
+      background: #f0f2f5;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin: 0 0 4px;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid #dde1e7;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      color: #777;
+      transition: all .2s;
+    }
+
+    .tab-btn:hover { color: #3b82f6; }
+    .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid #e4e8ef;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #f8f9fb;
+      border-bottom: 1px solid #e4e8ef;
+    }
+
+    .card-header-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: #666;
+    }
+
+    .card-body {
+      padding: 20px;
+    }
+
+    /* ── Code block ── */
+    .code-wrap {
+      position: relative;
+    }
+
+    .code-block {
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      padding: 20px;
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 520px;
+      margin: 0;
+      white-space: pre;
+    }
+
+    /* simple keyword colours */
+    .kw { color: #cba6f7; }      /* var const function new */
+    .fn { color: #89b4fa; }      /* function names */
+    .str { color: #a6e3a1; }     /* strings */
+    .cm { color: #6c7086; font-style: italic; } /* comments */
+    .num { color: #fab387; }     /* numbers/booleans */
+    .prop { color: #89dceb; }    /* object props */
+
+    /* ── JSON output ── */
+    .json-wrap { position: relative; }
+
+    #json-output {
+      background: #1e1e2e;
+      color: #a6e3a1;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      padding: 20px;
+      border-radius: 8px;
+      overflow: auto;
+      max-height: 520px;
+      margin: 0;
+      white-space: pre;
+    }
+
+    /* ── Copy button ── */
+    .btn-copy {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 5px;
+      border: 1px solid #dde1e7;
+      background: #fff;
+      color: #555;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .btn-copy:hover { background: #f0f2f5; }
+    .btn-copy.copied { background: #dcfce7; color: #16a34a; border-color: #86efac; }
+
+    /* ── Split layout ── */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .split { grid-template-columns: 1fr; }
+    }
+
+    /* ── Preview section ── */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+
+    .dfb-wrapper {
+      max-width: 720px;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── Step indicator ── */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      counter-reset: step;
+    }
+
+    .step {
+      flex: 1;
+      position: relative;
+      padding: 12px 16px 12px 40px;
+      background: #f8f9fb;
+      border: 1px solid #e4e8ef;
+      border-right: none;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .step:first-child { border-radius: 8px 0 0 8px; }
+    .step:last-child  { border-right: 1px solid #e4e8ef; border-radius: 0 8px 8px 0; }
+
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .step strong { display: block; color: #333; font-size: 12px; margin-bottom: 2px; }
+  </style>
+</head>
+
+<body>
+
+  <h1>Form Schema Builder <span class="badge">form-builder.js</span></h1>
+  <p class="page-subtitle">
+    Dùng <strong>FormSchemaBuilder</strong> để tạo Schema JSON bằng code thay vì viết JSON thủ công.
+    Kết quả có thể dùng trực tiếp với <strong>FormRenderer</strong> hoặc lưu lên server.
+  </p>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step"><strong>1. Khai báo schema</strong>new FormSchema({ title, key_name })</div>
+    <div class="step"><strong>2. Thêm Box</strong>schema.addBox('Tiêu đề box')</div>
+    <div class="step"><strong>3. Thêm Row</strong>box.addRow(Input({…}), Select({…}))</div>
+    <div class="step"><strong>4. Xuất JSON</strong>schema.toJSON() / schema.toString()</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('code')">Builder Code</button>
+    <button class="tab-btn" onclick="switchTab('json')">JSON Output</button>
+    <button class="tab-btn" onclick="switchTab('preview')">Form Preview</button>
+  </div>
+
+  <!-- Tab: Code -->
+  <div class="tab-panel active" id="tab-code">
+    <div class="split">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-title">Thiết lập Schema</span>
+          <span style="font-size:11px;color:#aaa;">form-builder.js</span>
+        </div>
+        <div class="code-wrap">
+          <pre class="code-block" id="builder-code"></pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-header-title">JSON sinh ra</span>
+          <button class="btn-copy" id="copy-btn-code" onclick="copyJSON('copy-btn-code')">Copy JSON</button>
+        </div>
+        <div class="json-wrap">
+          <pre id="json-output"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: JSON -->
+  <div class="tab-panel" id="tab-json">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">JSON Schema đầy đủ</span>
+        <button class="btn-copy" id="copy-btn-json" onclick="copyJSON('copy-btn-json')">Copy JSON</button>
+      </div>
+      <div class="json-wrap">
+        <pre id="json-output-full"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Preview -->
+  <div class="tab-panel" id="tab-preview">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Form Preview</span>
+        <span style="font-size:11px;color:#aaa;">Render bởi form-renderer.js</span>
+      </div>
+      <div class="card-body">
+        <div class="dfb-wrapper">
+          <form id="dynamic-form">
+            <div id="dynamic-form-container"></div>
+            <div style="margin-top: 20px;">
+              <button type="button" id="btn-submit" class="dfb-button">Submit Form</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       BUILD SCHEMA BẰNG FormSchemaBuilder
+    ========================================================= */
+    var B = FormSchemaBuilder;
+
+    var schema = new B.FormSchema({
+      title: 'Bổ sung thông tin vRace',
+      key_name: 'additional_info',
+      description: 'Form bổ sung thông tin thành viên',
+      enabled: true
+    });
+
+    /* ── Box 1: Bổ sung thông tin ── */
+    var box1 = schema.addBox('Bổ sung thông tin');
+
+    box1.addRow(B.Text({
+      content: 'Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.',
+      textType: 'p'
+    }));
+
+    box1.addRow(B.Radio({
+      label: 'Thông tin thành viên',
+      name: 'member_type',
+      required: true,
+      radioType: 'component',
+      radioOptions: [
+        B.RadioOption({
+          label: 'Thành viên công ty bảo hiểm',
+          value: '1',
+          components: [
+            B.Input({ label: 'Email', name: 'email', required: true }),
+            B.Select({
+              label: 'Công ty thành viên',
+              name: 'company_type',
+              required: true,
+              options: [
+                { label: 'Công ty A', value: 'cong_ty_a' },
+                { label: 'Công ty B', value: 'cong_ty_b' }
+              ]
+            })
+          ]
+        }),
+        B.RadioOption({
+          label: 'Đối tác hoặc người thân FPT',
+          value: '2',
+          components: [
+            B.Select({
+              label: 'Mối quan hệ',
+              name: 'relationship_type',
+              required: true,
+              options: [
+                { label: 'Đối tác', value: '1' },
+                { label: 'Người thân', value: '2' }
+              ]
+            }),
+            B.Select({
+              label: 'Công ty thành viên',
+              name: 'company_member',
+              sourceId: 'pYpgIJ4BzV6vPH2ttDCu'
+            })
+          ]
+        }),
+        B.RadioOption({ label: 'Khác', value: '3' })
+      ]
+    }));
+
+    box1.addRow(B.HTML({
+      content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a>, Fanpage vRace để được hỗ trợ.'
+    }));
+
+    /* ── Box 2: Điều khoản ── */
+    var box2 = schema.addBox('Điều khoản');
+
+    box2.addRow(B.Text({
+      content: 'Vui lòng đọc và xác nhận điều khoản trước khi tiếp tục.',
+      textType: 'p'
+    }));
+
+    box2.addRow(B.Checkbox({
+      label: 'Thông tin điều khoản',
+      name: 'policy_ids',
+      required: true,
+      options: [
+        { label: 'Tôi xác nhận tôi từ đủ 18 tuổi trở lên.', value: '1' },
+        { label: 'Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng và Thể lệ Sự Kiện.', value: '2' }
+      ]
+    }));
+
+    box2.addRow(B.HTML({
+      content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a>, Fanpage vRace để được hỗ trợ.'
+    }));
+
+    /* =========================================================
+       XUẤT JSON
+    ========================================================= */
+    var schemaJSON = schema.toJSON();
+    var jsonStr = schema.toString();
+
+    document.getElementById('json-output').textContent = jsonStr;
+    document.getElementById('json-output-full').textContent = jsonStr;
+
+    /* =========================================================
+       RENDER FORM PREVIEW
+    ========================================================= */
+    var renderer = new FormRenderer({
+      container: '#dynamic-form-container',
+      data: schemaJSON.boxes,
+      submitBtn: '#btn-submit',
+
+      classes: {
+        formGroup: 'dfb-field',
+        formLabel: 'dfb-label',
+        formControl: 'dfb-input',
+        inputWrapper: null,
+        hasError: 'dfb-has-error',
+        hasSuccess: '',
+        isInvalid: 'dfb-invalid',
+        helpText: 'dfb-help',
+        requiredMark: 'dfb-required',
+        row: 'dfb-row',
+        col: function (n) { return 'dfb-col-' + n; },
+        checkboxWrapper: 'dfb-checkbox-item',
+        radioWrapper: 'dfb-radio-item',
+        checkboxLabel: 'dfb-checkbox-label',
+        radioLabel: 'dfb-radio-label',
+        checkboxInput: 'dfb-checkbox-input',
+        radioInput: 'dfb-radio-input',
+        floatWrap: 'dfb-float-wrap',
+        floatFilled: 'dfb-is-filled',
+        boxWrapper: 'dfb-box',
+        boxTitle: 'dfb-box__title',
+        boxBody: 'dfb-box__body'
+      },
+
+      loadOptions: function (sourceId, callback) {
+        var sourceMap = {
+          'pYpgIJ4BzV6vPH2ttDCu': [
+            { value: 'cty_a', label: 'Công ty A' },
+            { value: 'cty_b', label: 'Công ty B' },
+            { value: 'cty_c', label: 'Công ty C' }
+          ]
+        };
+        setTimeout(function () { callback(sourceMap[sourceId] || []); }, 400);
+      },
+
+      onChange: function (name, value) {
+        console.log('[onChange]', name, '=', value);
+      },
+
+      onSubmit: function (values) {
+        alert('Submit thành công.\n\n' + JSON.stringify(values, null, 2));
+      }
+    });
+
+    renderer.render();
+
+    /* =========================================================
+       HIỂN THỊ CODE NGUỒN (literal)
+    ========================================================= */
+    var builderSrc = [
+      "var B = FormSchemaBuilder;",
+      "",
+      "// 1. Tạo schema",
+      "var schema = new B.FormSchema({",
+      "  title:       'Bổ sung thông tin vRace',",
+      "  key_name:    'additional_info',",
+      "  description: 'Form bổ sung thông tin thành viên',",
+      "  enabled:     true",
+      "});",
+      "",
+      "// 2. Box 1 — Bổ sung thông tin",
+      "var box1 = schema.addBox('Bổ sung thông tin');",
+      "",
+      "box1.addRow(B.Text({",
+      "  content:  'Nếu bạn là thành viên...',",
+      "  textType: 'p'",
+      "}));",
+      "",
+      "box1.addRow(B.Radio({",
+      "  label:     'Thông tin thành viên',",
+      "  name:      'member_type',",
+      "  required:  true,",
+      "  radioType: 'component',",
+      "  radioOptions: [",
+      "    B.RadioOption({",
+      "      label: 'Thành viên công ty bảo hiểm', value: '1',",
+      "      components: [",
+      "        B.Input({ label: 'Email', name: 'email', required: true }),",
+      "        B.Select({",
+      "          label: 'Công ty thành viên', name: 'company_type',",
+      "          required: true,",
+      "          options: [",
+      "            { label: 'Công ty A', value: 'cong_ty_a' },",
+      "            { label: 'Công ty B', value: 'cong_ty_b' }",
+      "          ]",
+      "        })",
+      "      ]",
+      "    }),",
+      "    B.RadioOption({",
+      "      label: 'Đối tác hoặc người thân FPT', value: '2',",
+      "      components: [",
+      "        B.Select({",
+      "          label: 'Mối quan hệ', name: 'relationship_type',",
+      "          required: true,",
+      "          options: [",
+      "            { label: 'Đối tác',   value: '1' },",
+      "            { label: 'Người thân', value: '2' }",
+      "          ]",
+      "        }),",
+      "        B.Select({",
+      "          label:    'Công ty thành viên',",
+      "          name:     'company_member',",
+      "          sourceId: 'pYpgIJ4BzV6vPH2ttDCu'  // dynamic options",
+      "        })",
+      "      ]",
+      "    }),",
+      "    B.RadioOption({ label: 'Khác', value: '3' })",
+      "  ]",
+      "}));",
+      "",
+      "box1.addRow(B.HTML({ content: 'Hotline: <a href=\"tel:1900633003\">1900633003</a>' }));",
+      "",
+      "// 3. Box 2 — Điều khoản",
+      "var box2 = schema.addBox('Điều khoản');",
+      "",
+      "box2.addRow(B.Text({ content: 'Vui lòng đọc và xác nhận...', textType: 'p' }));",
+      "",
+      "box2.addRow(B.Checkbox({",
+      "  label:    'Thông tin điều khoản',",
+      "  name:     'policy_ids',",
+      "  required: true,",
+      "  options: [",
+      "    { label: 'Tôi xác nhận tôi từ đủ 18 tuổi trở lên.', value: '1' },",
+      "    { label: 'Tôi đã đọc và đồng ý Điều Khoản Sử Dụng.', value: '2' }",
+      "  ]",
+      "}));",
+      "",
+      "// 4. Xuất JSON",
+      "var json   = schema.toJSON();    // object",
+      "var jsonStr = schema.toString(); // chuỗi JSON đẹp"
+    ].join('\n');
+
+    document.getElementById('builder-code').textContent = builderSrc;
+
+    /* =========================================================
+       TAB SWITCHING
+    ========================================================= */
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelector('.tab-btn[onclick*="' + name + '"]').classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    /* =========================================================
+       COPY JSON
+    ========================================================= */
+    function copyJSON(btnId) {
+      var text = jsonStr;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function () { flashCopied(btnId); });
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        flashCopied(btnId);
+      }
+    }
+
+    function flashCopied(btnId) {
+      var btn = document.getElementById(btnId);
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(function () {
+        btn.textContent = 'Copy JSON';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+  </script>
+
+</body>
+</html>
