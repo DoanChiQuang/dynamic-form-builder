@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dynamic Form Builder Plugin</title>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Form Renderer -->
+    <script src="form-renderer.js"></script>
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="styles.css" />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 32px;
+            background: #f4f5f7;
+            font-family: Arial, sans-serif;
+        }
+
+        .demo-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="demo-wrapper">
+        <div class="dfb-wrapper">
+            <div class="dfb-card">
+
+                <h2 class="dfb-card__title">
+                    Dynamic Form Builder
+                    <span class="dfb-required">*</span>
+                </h2>
+
+                <form id="dynamic-form">
+                    <div id="dynamic-form-container"></div>
+
+                    <div style="margin-top: 24px;">
+                        <button type="button" id="btn-submit" class="dfb-button">
+                            Submit Form
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           MOCK API LOAD OPTIONS
+        ========================================================= */
+        function loadSelectOptions(sourceId, callback) {
+
+            const sourceMap = {
+                company_source: [
+                    {
+                        value: 'fpt_software',
+                        label: 'FPT Software'
+                    },
+                    {
+                        value: 'fpt_telecom',
+                        label: 'FPT Telecom'
+                    },
+                    {
+                        value: 'fpt_education',
+                        label: 'FPT Education'
+                    }
+                ],
+
+                relationship_source: [
+                    {
+                        value: 'partner',
+                        label: 'Đối tác'
+                    },
+                    {
+                        value: 'relative',
+                        label: 'Người thân'
+                    }
+                ]
+            };
+
+            setTimeout(function () {
+                callback(sourceMap[sourceId] || []);
+            }, 500);
+        }
+
+        /* =========================================================
+           SCHEMA
+        ========================================================= */
+        const schema = [
+
+            {
+                variant: 'Text',
+                textType: 'p',
+                content:
+                    'Nếu bạn là thành viên hoặc đối tác của công ty, vui lòng bổ sung thông tin bên dưới.'
+            },
+
+            [
+                {
+                    variant: 'Input',
+                    name: 'first_name',
+                    label: 'Họ',
+                    required: true
+                },
+
+                {
+                    variant: 'Input',
+                    name: 'last_name',
+                    label: 'Tên',
+                    required: true
+                }
+            ],
+
+            {
+                variant: 'Input',
+                name: 'email',
+                label: 'Email',
+                required: true
+            },
+
+            {
+                variant: 'Select',
+                name: 'company',
+                label: 'Công ty thành viên',
+                sourceId: 'company_source',
+                required: true
+            },
+
+            {
+                variant: 'Checkbox',
+                name: 'hobbies',
+                label: 'Sở thích',
+                options: [
+                    'Đọc sách',
+                    'Chạy bộ',
+                    'Du lịch'
+                ]
+            },
+
+            {
+                variant: 'Radio',
+                name: 'member_type',
+                label: 'Thông tin thành viên',
+                radioType: 'component',
+
+                radioOptions: [
+                    {
+                        label: 'Nhân viên FPT',
+
+                        components: [
+                            {
+                                variant: 'Input',
+                                name: 'employee_code',
+                                label: 'Mã nhân viên',
+                                required: true
+                            },
+
+                            {
+                                variant: 'Select',
+                                name: 'department',
+                                label: 'Phòng ban',
+                                options: [
+                                    'IT',
+                                    'Marketing',
+                                    'Business'
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        label: 'Đối tác hoặc người thân',
+
+                        components: [
+                            {
+                                variant: 'Select',
+                                name: 'relationship',
+                                label: 'Mối quan hệ',
+                                sourceId: 'relationship_source'
+                            },
+
+                            {
+                                variant: 'Input',
+                                name: 'company_name',
+                                label: 'Tên công ty'
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            {
+                variant: 'HTML',
+
+                content:
+                    'Nếu cần hỗ trợ vui lòng liên hệ <a href="tel:1900633003">1900633003</a>'
+            }
+        ];
+
+        /* =========================================================
+           INIT RENDERER
+        ========================================================= */
+        const renderer = new FormRenderer({
+
+            container: '#dynamic-form-container',
+
+            data: schema,
+
+            submitBtn: '#btn-submit',
+
+            /* =====================================================
+               CUSTOM CLASSES
+            ===================================================== */
+            classes: {
+
+                formGroup: 'dfb-field',
+
+                formLabel: 'dfb-label',
+
+                formControl: 'dfb-input',
+
+                inputWrapper: null,
+
+                hasError: 'dfb-has-error',
+
+                hasSuccess: '',
+
+                isInvalid: 'dfb-invalid',
+
+                helpText: 'dfb-help',
+
+                requiredMark: 'dfb-required',
+
+                row: 'dfb-row',
+
+                col: function (n) {
+                    return 'dfb-col-' + n;
+                },
+
+                checkboxWrapper: 'dfb-checkbox-item',
+
+                radioWrapper: 'dfb-radio-item',
+
+                checkboxLabel: 'dfb-checkbox-label',
+
+                radioLabel: 'dfb-radio-label',
+
+                checkboxInput: 'dfb-checkbox-input',
+
+                radioInput: 'dfb-radio-input',
+
+                floatWrap: 'dfb-float-wrap',
+
+                floatFilled: 'dfb-is-filled'
+            },
+
+            /* =====================================================
+               LOAD DYNAMIC OPTIONS
+            ===================================================== */
+            loadOptions: function (sourceId, callback) {
+                loadSelectOptions(sourceId, callback);
+            },
+
+            /* =====================================================
+               ON CHANGE
+            ===================================================== */
+            onChange: function (name, value, component) {
+
+                console.log('FIELD CHANGE');
+
+                console.log({
+                    name: name,
+                    value: value,
+                    component: component
+                });
+            },
+
+            /* =====================================================
+               ON SUBMIT
+            ===================================================== */
+            onSubmit: function (values) {
+
+                console.log('FORM VALUES');
+
+                console.log(values);
+
+                alert(
+                    'Submit thành công.\n\n' +
+                    JSON.stringify(values, null, 4)
+                );
+            }
+        });
+
+        /* =========================================================
+           RENDER
+        ========================================================= */
+        renderer.render();
+
+        /* =========================================================
+           EXAMPLE SET VALUES
+        ========================================================= */
+        setTimeout(function () {
+
+            renderer.setValues({
+
+                first_name: 'Nguyễn',
+
+                last_name: 'Văn A',
+
+                email: 'vana@example.com',
+
+                company: 'fpt_software',
+
+                hobbies: [
+                    'Đọc sách',
+                    'Du lịch'
+                ],
+
+                member_type: 'Nhân viên FPT',
+
+                employee_code: 'EMP001',
+
+                department: 'IT'
+            });
+
+        }, 1000);
+
+    </script>
+
+</body>
+
+</html>
