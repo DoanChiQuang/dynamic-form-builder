@@ -424,7 +424,7 @@
                 var ropts = comp.radioOptions || [];
                 ropts.forEach(function (ro, idx) {
                     $group.append(buildRadioItem(comp.name, ro.label, idx));
-                    var $subContainer = $('<div class="radio-components" style="margin-left:24px;padding:6px;border-left:2px solid #eee;display:none;">').attr('data-radio-index', idx);
+                    var $subContainer = $('<div class="radio-components" style="display:none;">').attr('data-radio-index', idx);
                     if (ro.components && ro.components.length) {
                         ro.components.forEach(function (sub) {
                             $subContainer.append(self._renderComponent(sub));

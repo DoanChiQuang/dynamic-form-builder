@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bổ sung thông tin</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 32px 32px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-card">
+        <form action="">
+            <div id="container"></div>
+        </form>
+    </div>
+
+    <script src="form-renderer.js"></script>
+
+    <script>
+        /* ── Schema ──────────────────────────────────────────────── */
+        const schemaArray = [
+            {
+                "id": "c_1778640964989_4",
+                "variant": "Text",
+                "label": "Description",
+                "rowIndex": 0,
+                "content": "Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.",
+                "textType": "p"
+            },
+            {
+                "id": "c_1778640992275_6",
+                "variant": "Radio",
+                "label": "Thông tin thành viên",
+                "rowIndex": 1,
+                "name": "name_9922750005",
+                "description": null,
+                "required": false,
+                "disabled": false,
+                "checked": false,
+                "radioType": "component",
+                "radioOptions": [
+                    {
+                        "label": "Thành viên FPT",
+                        "components": [
+                            {
+                                "id": "c_1778641031968_8",
+                                "variant": "Input",
+                                "label": "Email",
+                                "rowIndex": 0,
+                                "name": "name_0319680007",
+                                "placeholder": null,
+                                "description": null,
+                                "required": true,
+                                "disabled": false,
+                                "value": null
+                            },
+                            {
+                                "id": "c_1778641040254_10",
+                                "variant": "Select",
+                                "label": "Công ty thành viên",
+                                "rowIndex": 0,
+                                "name": "name_0402540009",
+                                "placeholder": null,
+                                "description": null,
+                                "required": true,
+                                "disabled": false,
+                                "options": [
+                                    "Công ty A",
+                                    "Công ty B"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "label": "Đối tác hoặc người thân FPT",
+                        "components": [
+                            {
+                                "id": "c_1778641288700_12",
+                                "variant": "Select",
+                                "label": "Mối quan hệ",
+                                "rowIndex": 0,
+                                "name": "name_2887000011",
+                                "placeholder": null,
+                                "description": null,
+                                "required": true,
+                                "disabled": false,
+                                "options": [
+                                    "Đối tác",
+                                    "Người thân"
+                                ]
+                            },
+                            {
+                                "id": "c_1778641290192_14",
+                                "variant": "Select",
+                                "label": "Công ty thành viên",
+                                "rowIndex": 0,
+                                "name": "name_2901920013",
+                                "placeholder": null,
+                                "description": null,
+                                "required": false,
+                                "disabled": false,
+                                "options": [
+                                    "Option 1"
+                                ],
+                                "sourceId": "pYpgIJ4BzV6vPH2ttDCu"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "c_1779098552905_2",
+                "variant": "HTML",
+                "label": "Footer",
+                "rowIndex": 2,
+                "content": "Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a class=\"color-link\" href=\"tel:1900633003:2\">1900633003</a> &lpar;nhánh 2&rpar; , Fanpage vRace để được hỗ trợ."
+            }            
+        ];
+
+        /* ── Render ──────────────────────────────────────────────── */
+        var renderer = new FormRenderer({
+            container: '#container',
+            data: schemaArray,
+            // classes: {
+            //     formGroup: 'field-wrap',
+            //     formLabel: 'field-label',
+            //     formControl: 'field-input',
+            //     inputWrapper: null,
+            //     hasError: 'field-error',
+            //     hasSuccess: '',
+            //     isInvalid: 'field-input--invalid',
+            //     helpText: 'field-hint',
+            //     requiredMark: 'required-star',
+            //     row: 'field-row',
+            //     col: 'field-col-{n}',
+            //     checkboxWrapper: 'check-item',
+            //     radioWrapper: 'radio-item',
+            //     checkboxLabel: null,
+            //     radioLabel: null,
+            //     checkboxInput: null,
+            //     radioInput: null
+            // }
+        });
+
+        renderer.render();        
+    </script>
+</body>
+
+</html>
