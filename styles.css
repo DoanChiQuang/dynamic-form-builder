@@ -243,6 +243,12 @@
     box-shadow: 0 0 0 3px rgba(240, 68, 56, .1) !important;
 }
 
+.dfb-radio-input.dfb-invalid,
+.dfb-checkbox-input.dfb-invalid {
+    border-color: var(--dfb-error) !important;
+    box-shadow: 0 0 0 3px rgba(240, 68, 56, .1) !important;
+}
+
 /* ===== ROW ===== */
 .dfb-row {
     display: flex;

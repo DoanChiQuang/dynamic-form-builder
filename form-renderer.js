@@ -179,13 +179,22 @@
                 ).removeClass(cls.isInvalid);
             }
             var firstError = null;
+            var seenRadioNames = {};
             this._container.find('[data-required="true"]').each(function () {
                 var $el = $(this);
+
+                var $radioComp = $el.closest('.radio-components');
+                if ($radioComp.length && !$radioComp.is(':visible')) {
+                    return;
+                }
+
                 var $group = $el.closest('[data-fr-group]');
                 var type = $el.attr('type') || '';
                 var empty = false;
                 if (type === 'radio') {
                     var name = $el.attr('name');
+                    if (seenRadioNames[name]) return;
+                    seenRadioNames[name] = true;
                     var $radios = $group.find('input[type="radio"][name="' + name + '"]');
                     empty = $radios.filter(':checked').length === 0;
                 } else if (type === 'checkbox') {
@@ -196,8 +205,12 @@
                 if (empty) {
                     valid = false;
                     if (cls.hasError) $group.addClass(cls.hasError);
-                    if (cls.isInvalid && type !== 'radio') {
-                        $el.addClass(cls.isInvalid);
+                    if (cls.isInvalid) {
+                        if (type === 'radio') {
+                            $radios.addClass(cls.isInvalid);
+                        } else {
+                            $el.addClass(cls.isInvalid);
+                        }
                     }
                     if (!firstError) firstError = $el.length ? $el : $group;
                 }
@@ -414,7 +427,11 @@
                 }
                 if (comp.options && comp.options.length) {
                     comp.options.forEach(function (opt) {
-                        $select.append('<option value="' + self._escapeHtml(opt) + '">' + self._escapeHtml(opt) + '</option>');
+                        if (typeof opt === 'object') {
+                            $select.append('<option value="' + self._escapeHtml(opt.value) + '">' + self._escapeHtml(opt.label) + '</option>');
+                        } else {
+                            $select.append('<option value="' + self._escapeHtml(opt) + '">' + self._escapeHtml(opt) + '</option>');
+                        }
                     });
                 }
                 if (comp.value) {
@@ -440,19 +457,21 @@
 
             if (comp.options && comp.options.length) {
                 comp.options.forEach(function (opt) {
+                    var optValue = typeof opt === 'object' ? opt.value : opt;
+                    var optLabel = typeof opt === 'object' ? opt.label : opt;
                     var $checkDiv = $('<div>').addClass(cls.checkboxWrapper);
                     var $checkLabel = $('<label>');
                     if (cls.checkboxLabel) $checkLabel.addClass(cls.checkboxLabel);
                     var $input = $('<input type="checkbox">')
                         .attr({
                             name: self._escapeHtml(comp.name),
-                            value: self._escapeHtml(opt),
+                            value: self._escapeHtml(optValue),
                             'data-required': !!comp.required
                         });
                     if (cls.checkboxInput) $input.addClass(cls.checkboxInput);
                     if (comp.checked) $input.prop('checked', true);
                     if (comp.disabled) $input.attr('disabled', true);
-                    $checkLabel.append($input).append(' ' + self._escapeHtml(opt));
+                    $checkLabel.append($input).append(' ' + self._escapeHtml(optLabel));
                     $checkDiv.append($checkLabel);
                     $group.append($checkDiv);
                 });
@@ -481,7 +500,7 @@
             var $group = $('<div>').addClass(cls.formGroup).attr('data-fr-group', '');
             $group.append($('<label>').addClass(cls.formLabel).html(this._escapeHtml(comp.label) + requiredMark));
 
-            var buildRadioItem = function (name, value, idx) {
+            var buildRadioItem = function (name, value, label, idx) {
                 var $radioDiv = $('<div>').addClass(cls.radioWrapper);
                 var $radioLabel = $('<label>');
                 if (cls.radioLabel) $radioLabel.addClass(cls.radioLabel);
@@ -494,7 +513,7 @@
                     });
                 if (cls.radioInput) $input.addClass(cls.radioInput);
                 if (comp.disabled) $input.attr('disabled', true);
-                $radioLabel.append($input).append(' ' + self._escapeHtml(value));
+                $radioLabel.append($input).append(' ' + self._escapeHtml(label));
                 $radioDiv.append($radioLabel);
                 return $radioDiv;
             };
@@ -502,7 +521,8 @@
             if (radioType === 'component') {
                 var ropts = comp.radioOptions || [];
                 ropts.forEach(function (ro, idx) {
-                    $group.append(buildRadioItem(comp.name, ro.label, idx));
+                    var roValue = (ro.value !== undefined && ro.value !== null) ? ro.value : ro.label;
+                    $group.append(buildRadioItem(comp.name, roValue, ro.label, idx));
                     var $subContainer = $('<div class="radio-components" style="display:none;">').attr('data-radio-index', idx);
                     if (ro.components && ro.components.length) {
                         ro.components.forEach(function (sub) {
@@ -525,7 +545,9 @@
                 }
             } else {
                 (comp.options || []).forEach(function (opt, idx) {
-                    var $radioDiv = buildRadioItem(comp.name, opt, idx);
+                    var optValue = typeof opt === 'object' ? opt.value : opt;
+                    var optLabel = typeof opt === 'object' ? opt.label : opt;
+                    var $radioDiv = buildRadioItem(comp.name, optValue, optLabel, idx);
                     if (comp.checked) $radioDiv.find('input').prop('checked', true);
                     $group.append($radioDiv);
                 });

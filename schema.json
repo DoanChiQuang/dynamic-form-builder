@@ -18,13 +18,14 @@
         "rowIndex": 1,
         "name": "name_9922750005",
         "description": "",
-        "required": false,
+        "required": true,
         "disabled": false,
         "checked": false,
         "radioType": "component",
         "radioOptions": [
           {
             "label": "Thành viên công ty bảo hiểm",
+            "value": "1",
             "components": [
               {
                 "id": "c_1778641031968_8",
@@ -49,14 +50,21 @@
                 "required": true,
                 "disabled": false,
                 "options": [
-                  "Công ty A",
-                  "Công ty B"
+                  {
+                    "label": "Công ty A",
+                    "value": "cong_ty_a"
+                  },
+                  {
+                    "label": "Công ty B",
+                    "value": "cong_ty_b"
+                  }
                 ]
               }
             ]
           },
           {
             "label": "Đối tác hoặc người thân FPT",
+            "value": "2",
             "components": [
               {
                 "id": "c_1778641288700_12",
@@ -69,8 +77,14 @@
                 "required": true,
                 "disabled": false,
                 "options": [
-                  "Đối tác",
-                  "Người thân"
+                  {
+                    "label": "Đối tác",
+                    "value": "1"
+                  },
+                  {
+                    "label": "Người thân",
+                    "value": "2"
+                  }
                 ]
               },
               {
@@ -92,6 +106,7 @@
           },
           {
             "label": "Khác",
+            "value": "3",
             "components": []
           }
         ]
@@ -128,8 +143,14 @@
         "disabled": false,
         "checked": false,
         "options": [
-          "Tôi xác nhận tôi từ đủ 18 tuổi trở lên.",
-          "Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies, Thể lệ Sự Kiện “Giải chạy Trực Tuyến Nestlé Việt Nam” của Nestlé. Tôi đồng ý nhận quà tặng, sản phẩm và các thông tin cập nhật về Sự Kiện từ Nestlé MILO cũng như các nhãn hàng khác của Nestlé và La Vie qua điện thoại, tin nhắn SMS, email."
+          {
+            "label": "Tôi xác nhận tôi từ đủ 18 tuổi trở lên.",
+            "value": "1"
+          },
+          {
+            "label": "Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies, Thể lệ Sự Kiện “Giải chạy Trực Tuyến Nestlé Việt Nam” của Nestlé. Tôi đồng ý nhận quà tặng, sản phẩm và các thông tin cập nhật về Sự Kiện từ Nestlé MILO cũng như các nhãn hàng khác của Nestlé và La Vie qua điện thoại, tin nhắn SMS, email.",
+            "value": "2"
+          }
         ]
       },
       {

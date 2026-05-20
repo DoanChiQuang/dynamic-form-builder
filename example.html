@@ -2,343 +2,331 @@
 <html lang="vi">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Dynamic Form Builder Plugin</title>
+  <title>Dynamic Form Builder Plugin</title>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Form Renderer -->
-    <script src="form-renderer.js"></script>
+  <!-- Form Renderer -->
+  <script src="form-renderer.js"></script>
 
-    <!-- Plugin CSS -->
-    <link rel="stylesheet" href="styles.css" />
+  <!-- Plugin CSS -->
+  <link rel="stylesheet" href="styles.css" />
 
-    <style>
-        body {
-            margin: 0;
-            padding: 32px;
-            background: #f4f5f7;
-            font-family: Arial, sans-serif;
-        }
+  <style>
+    body {
+      margin: 0;
+      padding: 32px;
+      background: #f4f5f7;
+      font-family: Arial, sans-serif;
+    }
 
-        .demo-wrapper {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-    </style>
+    .demo-wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 
 <body>
 
-    <div class="demo-wrapper">
-        <div class="dfb-wrapper">
+  <div class="demo-wrapper">
+    <div class="dfb-wrapper">
 
-            <form id="dynamic-form">
-                <div id="dynamic-form-container"></div>
+      <form id="dynamic-form">
+        <div id="dynamic-form-container"></div>
 
-                <div style="margin-top: 24px;">
-                    <button type="button" id="btn-submit" class="dfb-button">
-                        Submit Form
-                    </button>
-                </div>
-            </form>
-
+        <div style="margin-top: 24px;">
+          <button type="button" id="btn-submit" class="dfb-button">
+            Submit Form
+          </button>
         </div>
+      </form>
+
     </div>
+  </div>
 
-    <script>
-        /* =========================================================
-           MOCK API LOAD OPTIONS
-        ========================================================= */
-        function loadSelectOptions(sourceId, callback) {
+  <script>
+    /* =========================================================
+       MOCK API LOAD OPTIONS
+    ========================================================= */
+    function loadSelectOptions(sourceId, callback) {
 
-            const sourceMap = {
-                company_source: [
-                    { value: 'fpt_software',   label: 'FPT Software' },
-                    { value: 'fpt_telecom',    label: 'FPT Telecom' },
-                    { value: 'fpt_education',  label: 'FPT Education' }
-                ],
+      const sourceMap = {
+        company_source: [
+          { value: 'fpt_software', label: 'FPT Software' },
+          { value: 'fpt_telecom', label: 'FPT Telecom' },
+          { value: 'fpt_education', label: 'FPT Education' }
+        ],
 
-                relationship_source: [
-                    { value: 'partner',  label: 'Đối tác' },
-                    { value: 'relative', label: 'Người thân' }
-                ],
+        relationship_source: [
+          { value: 'partner', label: 'Đối tác' },
+          { value: 'relative', label: 'Người thân' }
+        ],
 
-                // sourceId từ schema.json — Công ty thành viên trong nhánh "Đối tác hoặc người thân FPT"
-                pYpgIJ4BzV6vPH2ttDCu: [
-                    { value: 'cty_a', label: 'Công ty A' },
-                    { value: 'cty_b', label: 'Công ty B' },
-                    { value: 'cty_c', label: 'Công ty C' }
+        // sourceId từ schema.json — Công ty thành viên trong nhánh "Đối tác hoặc người thân FPT"
+        pYpgIJ4BzV6vPH2ttDCu: [
+          { value: 'cty_a', label: 'Công ty A' },
+          { value: 'cty_b', label: 'Công ty B' },
+          { value: 'cty_c', label: 'Công ty C' }
+        ]
+      };
+
+      setTimeout(function () {
+        callback(sourceMap[sourceId] || []);
+      }, 500);
+    }
+
+    /* =========================================================
+       SCHEMA — Boxes format (từ schema.json)
+    ========================================================= */
+    const schema = [
+      {
+        "id": "box_1",
+        "title": "Bổ sung thông tin",
+        "rows": [
+          {
+            "id": "c_1778640964989_4",
+            "variant": "Text",
+            "label": "Description",
+            "rowIndex": 0,
+            "content": "Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.",
+            "textType": "p"
+          },
+          {
+            "id": "c_1778640992275_6",
+            "variant": "Radio",
+            "label": "Thông tin thành viên",
+            "rowIndex": 1,
+            "name": "member_type",
+            "description": "",
+            "required": true,
+            "disabled": false,
+            "checked": false,
+            "radioType": "component",
+            "radioOptions": [
+              {
+                "label": "Thành viên công ty bảo hiểm",
+                "value": "1",
+                "components": [
+                  {
+                    "id": "c_1778641031968_8",
+                    "variant": "Input",
+                    "label": "Email",
+                    "rowIndex": 0,
+                    "name": "email",
+                    "placeholder": "",
+                    "description": "",
+                    "required": true,
+                    "disabled": false,
+                    "value": ""
+                  },
+                  {
+                    "id": "c_1778641040254_10",
+                    "variant": "Select",
+                    "label": "Công ty thành viên",
+                    "rowIndex": 0,
+                    "name": "company_type",
+                    "placeholder": "",
+                    "description": "",
+                    "required": true,
+                    "disabled": false,
+                    "options": [
+                      {
+                        "label": "Công ty A",
+                        "value": "cong_ty_a"
+                      },
+                      {
+                        "label": "Công ty B",
+                        "value": "cong_ty_b"
+                      }
+                    ]
+                  }
                 ]
-            };
-
-            setTimeout(function () {
-                callback(sourceMap[sourceId] || []);
-            }, 500);
-        }
-
-        /* =========================================================
-           SCHEMA — Boxes format (từ schema.json)
-        ========================================================= */
-        const schema = [
-            {
-                id: 'box_1',
-                title: 'Bổ sung thông tin',
-                rows: [
-                    {
-                        id: 'c_1778640964989_4',
-                        variant: 'Text',
-                        label: 'Description',
-                        rowIndex: 0,
-                        content: 'Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.',
-                        textType: 'p'
-                    },
-                    {
-                        id: 'c_1778640992275_6',
-                        variant: 'Radio',
-                        label: 'Thông tin thành viên',
-                        rowIndex: 1,
-                        name: 'name_9922750005',
-                        description: '',
-                        required: false,
-                        disabled: false,
-                        checked: false,
-                        radioType: 'component',
-                        radioOptions: [
-                            {
-                                label: 'Thành viên công ty bảo hiểm',
-                                components: [
-                                    {
-                                        id: 'c_1778641031968_8',
-                                        variant: 'Input',
-                                        label: 'Email',
-                                        rowIndex: 0,
-                                        name: 'name_0319680007',
-                                        placeholder: '',
-                                        description: '',
-                                        required: true,
-                                        disabled: false,
-                                        value: ''
-                                    },
-                                    {
-                                        id: 'c_1778641040254_10',
-                                        variant: 'Select',
-                                        label: 'Công ty thành viên',
-                                        rowIndex: 0,
-                                        name: 'name_0402540009',
-                                        placeholder: '',
-                                        description: '',
-                                        required: true,
-                                        disabled: false,
-                                        options: ['Công ty A', 'Công ty B']
-                                    }
-                                ]
-                            },
-                            {
-                                label: 'Đối tác hoặc người thân FPT',
-                                components: [
-                                    {
-                                        id: 'c_1778641288700_12',
-                                        variant: 'Select',
-                                        label: 'Mối quan hệ',
-                                        rowIndex: 0,
-                                        name: 'name_2887000011',
-                                        placeholder: '',
-                                        description: '',
-                                        required: true,
-                                        disabled: false,
-                                        options: ['Đối tác', 'Người thân']
-                                    },
-                                    {
-                                        id: 'c_1778641290192_14',
-                                        variant: 'Select',
-                                        label: 'Công ty thành viên',
-                                        rowIndex: 0,
-                                        name: 'name_2901920013',
-                                        placeholder: '',
-                                        description: '',
-                                        required: false,
-                                        disabled: false,
-                                        options: ['Option 1'],
-                                        sourceId: 'pYpgIJ4BzV6vPH2ttDCu'
-                                    }
-                                ]
-                            },
-                            {
-                                label: 'Khác',
-                                components: []
-                            }
-                        ]
-                    },
-                    {
-                        id: 'c_1779098552905_2',
-                        variant: 'HTML',
-                        label: 'Footer',
-                        rowIndex: 2,
-                        content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a> (nhánh 2), Fanpage vRace để được hỗ trợ.'
-                    }
+              },
+              {
+                "label": "Đối tác hoặc người thân FPT",
+                "value": "2",
+                "components": [
+                  {
+                    "id": "c_1778641288700_12",
+                    "variant": "Select",
+                    "label": "Mối quan hệ",
+                    "rowIndex": 0,
+                    "name": "relationship_type",
+                    "placeholder": "",
+                    "description": "",
+                    "required": true,
+                    "disabled": false,
+                    "options": [
+                      {
+                        "label": "Đối tác",
+                        "value": "1"
+                      },
+                      {
+                        "label": "Người thân",
+                        "value": "2"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "c_1778641290192_14",
+                    "variant": "Select",
+                    "label": "Công ty thành viên",
+                    "rowIndex": 0,
+                    "name": "company_member",
+                    "placeholder": "",
+                    "description": "",
+                    "required": false,
+                    "disabled": false,
+                    "options": [
+                      {
+                        "label": "Option 1",
+                        "value": "Option 1"
+                      }
+                    ],
+                    "sourceId": "pYpgIJ4BzV6vPH2ttDCu"
+                  }
                 ]
-            },
-            {
-                id: 'box_3',
-                title: 'Điều khoản',
-                rows: [
-                    {
-                        id: 'c_1779263697964_3',
-                        variant: 'Text',
-                        label: 'Mô tả',
-                        rowIndex: 0,
-                        content: 'Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.',
-                        textType: 'p'
-                    },
-                    {
-                        id: 'c_1779263720877_5',
-                        variant: 'Checkbox',
-                        label: 'Thông tin điều khoản',
-                        rowIndex: 1,
-                        name: 'name_7208760004',
-                        description: '',
-                        required: true,
-                        disabled: false,
-                        checked: false,
-                        options: [
-                            'Tôi xác nhận tôi từ đủ 18 tuổi trở lên.',
-                            'Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies, Thể lệ Sự Kiện "Giải chạy Trực Tuyến Nestlé Việt Nam" của Nestlé. Tôi đồng ý nhận quà tặng, sản phẩm và các thông tin cập nhật về Sự Kiện từ Nestlé MILO cũng như các nhãn hàng khác của Nestlé và La Vie qua điện thoại, tin nhắn SMS, email.'
-                        ]
-                    },
-                    {
-                        id: 'c_1779263782762_7',
-                        variant: 'HTML',
-                        label: 'New HTML',
-                        rowIndex: 2,
-                        content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a> (nhánh 2), Fanpage vRace để được hỗ trợ.'
-                    }
-                ]
-            }
-        ];
+              },
+              {
+                "label": "Khác",
+                "value": "3",
+                "components": []
+              }
+            ]
+          },
+          {
+            "id": "c_1779098552905_2",
+            "variant": "HTML",
+            "label": "Footer",
+            "rowIndex": 2,
+            "content": "Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a class=\"color-link\" href=\"tel:1900633003:2\">1900633003</a> &lpar;nhánh 2&rpar; , Fanpage vRace để được hỗ trợ."
+          }
+        ]
+      },
+      {
+        "id": "box_3",
+        "title": "Điều khoản",
+        "rows": [
+          {
+            "id": "c_1779263697964_3",
+            "variant": "Text",
+            "label": "Mô tả",
+            "rowIndex": 0,
+            "content": "Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.",
+            "textType": "p"
+          },
+          {
+            "id": "c_1779263720877_5",
+            "variant": "Checkbox",
+            "label": "Thông tin điều khoản",
+            "rowIndex": 1,
+            "name": "policy_ids",
+            "description": "",
+            "required": true,
+            "disabled": false,
+            "checked": false,
+            "options": [
+              {
+                "label": "Tôi xác nhận tôi từ đủ 18 tuổi trở lên.",
+                "value": "1"
+              },
+              {
+                "label": "Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies, Thể lệ Sự Kiện “Giải chạy Trực Tuyến Nestlé Việt Nam” của Nestlé. Tôi đồng ý nhận quà tặng, sản phẩm và các thông tin cập nhật về Sự Kiện từ Nestlé MILO cũng như các nhãn hàng khác của Nestlé và La Vie qua điện thoại, tin nhắn SMS, email.",
+                "value": "2"
+              }
+            ]
+          },
+          {
+            "id": "c_1779263782762_7",
+            "variant": "HTML",
+            "label": "New HTML",
+            "rowIndex": 2,
+            "content": "Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a class=\"color-link\" href=\"tel:1900633003:2\">1900633003</a> &lpar;nhánh 2&rpar; , Fanpage vRace để được hỗ trợ."
+          }
+        ]
+      }
+    ];
 
-        /* =========================================================
-           INIT RENDERER
-        ========================================================= */
-        const renderer = new FormRenderer({
+    /* =========================================================
+       INIT RENDERER
+    ========================================================= */
+    const renderer = new FormRenderer({
+      container: '#dynamic-form-container',
+      data: schema,
+      submitBtn: '#btn-submit',
 
-            container: '#dynamic-form-container',
+      /* =====================================================
+         CUSTOM CLASSES
+      ===================================================== */
+      classes: {
+        formGroup: 'dfb-field',
+        formLabel: 'dfb-label',
+        formControl: 'dfb-input',
+        inputWrapper: null,
+        hasError: 'dfb-has-error',
+        hasSuccess: '',
+        isInvalid: 'dfb-invalid',
+        helpText: 'dfb-help',
+        requiredMark: 'dfb-required',
+        row: 'dfb-row',
+        col: function (n) {
+          return 'dfb-col-' + n;
+        },
+        checkboxWrapper: 'dfb-checkbox-item',
+        radioWrapper: 'dfb-radio-item',
+        checkboxLabel: 'dfb-checkbox-label',
+        radioLabel: 'dfb-radio-label',
+        checkboxInput: 'dfb-checkbox-input',
+        radioInput: 'dfb-radio-input',
+        floatWrap: 'dfb-float-wrap',
+        floatFilled: 'dfb-is-filled',
+        boxWrapper: 'dfb-box',
+        boxTitle: 'dfb-box__title',
+        boxBody: 'dfb-box__body'
+      },
 
-            data: schema,
+      /* =====================================================
+         LOAD DYNAMIC OPTIONS
+      ===================================================== */
+      loadOptions: function (sourceId, callback) {
+        loadSelectOptions(sourceId, callback);
+      },
 
-            submitBtn: '#btn-submit',
-
-            /* =====================================================
-               CUSTOM CLASSES
-            ===================================================== */
-            classes: {
-
-                formGroup: 'dfb-field',
-
-                formLabel: 'dfb-label',
-
-                formControl: 'dfb-input',
-
-                inputWrapper: null,
-
-                hasError: 'dfb-has-error',
-
-                hasSuccess: '',
-
-                isInvalid: 'dfb-invalid',
-
-                helpText: 'dfb-help',
-
-                requiredMark: 'dfb-required',
-
-                row: 'dfb-row',
-
-                col: function (n) {
-                    return 'dfb-col-' + n;
-                },
-
-                checkboxWrapper: 'dfb-checkbox-item',
-
-                radioWrapper: 'dfb-radio-item',
-
-                checkboxLabel: 'dfb-checkbox-label',
-
-                radioLabel: 'dfb-radio-label',
-
-                checkboxInput: 'dfb-checkbox-input',
-
-                radioInput: 'dfb-radio-input',
-
-                floatWrap: 'dfb-float-wrap',
-
-                floatFilled: 'dfb-is-filled',
-
-                boxWrapper: 'dfb-box',
-
-                boxTitle: 'dfb-box__title',
-
-                boxBody: 'dfb-box__body'
-            },
-
-            /* =====================================================
-               LOAD DYNAMIC OPTIONS
-            ===================================================== */
-            loadOptions: function (sourceId, callback) {
-                loadSelectOptions(sourceId, callback);
-            },
-
-            /* =====================================================
-               ON CHANGE
-            ===================================================== */
-            onChange: function (name, value, component) {
-
-                console.log('FIELD CHANGE');
-
-                console.log({
-                    name: name,
-                    value: value,
-                    component: component
-                });
-            },
-
-            /* =====================================================
-               ON SUBMIT
-            ===================================================== */
-            onSubmit: function (values) {
-
-                console.log('FORM VALUES');
-
-                console.log(values);
-
-                alert(
-                    'Submit thành công.\n\n' +
-                    JSON.stringify(values, null, 4)
-                );
-            }
+      /* =====================================================
+         ON CHANGE
+      ===================================================== */
+      onChange: function (name, value, component) {
+        console.log('FIELD CHANGE');
+        console.log({
+          name: name,
+          value: value,
+          component: component
         });
+      },
 
-        /* =========================================================
-           RENDER
-        ========================================================= */
-        renderer.render();
+      /* =====================================================
+         ON SUBMIT
+      ===================================================== */
+      onSubmit: function (values) {
+        console.log('FORM VALUES');
+        console.log(values);
+        alert(
+          'Submit thành công.\n\n' +
+          JSON.stringify(values, null, 4)
+        );
+      }
+    });
 
-        /* =========================================================
-           EXAMPLE SET VALUES
-        ========================================================= */
-        setTimeout(function () {
-
-            renderer.setValues({
-                name_9922750005: 'Thành viên công ty bảo hiểm',
-                name_0319680007: 'test@example.com',
-                name_0402540009: 'Công ty A'
-            });
-
-        }, 1000);
-
-    </script>
+    /* =========================================================
+       RENDER
+    ========================================================= */
+    renderer.render();
+  </script>
 
 </body>
 
