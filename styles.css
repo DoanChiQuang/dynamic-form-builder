@@ -511,6 +511,28 @@
     cursor: not-allowed;
 }
 
+/* ===== BOX ===== */
+.dfb-box {
+    background: var(--dfb-bg);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: var(--dfb-shadow);
+    margin-bottom: 16px;
+}
+
+.dfb-box:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== BOX TITLE ===== */
+.dfb-box__title {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--dfb-text);
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
     .dfb-card {

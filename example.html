@@ -35,24 +35,17 @@
 
     <div class="demo-wrapper">
         <div class="dfb-wrapper">
-            <div class="dfb-card">
 
-                <h2 class="dfb-card__title">
-                    Dynamic Form Builder
-                    <span class="dfb-required">*</span>
-                </h2>
+            <form id="dynamic-form">
+                <div id="dynamic-form-container"></div>
 
-                <form id="dynamic-form">
-                    <div id="dynamic-form-container"></div>
+                <div style="margin-top: 24px;">
+                    <button type="button" id="btn-submit" class="dfb-button">
+                        Submit Form
+                    </button>
+                </div>
+            </form>
 
-                    <div style="margin-top: 24px;">
-                        <button type="button" id="btn-submit" class="dfb-button">
-                            Submit Form
-                        </button>
-                    </div>
-                </form>
-
-            </div>
         </div>
     </div>
 
@@ -64,29 +57,21 @@
 
             const sourceMap = {
                 company_source: [
-                    {
-                        value: 'fpt_software',
-                        label: 'FPT Software'
-                    },
-                    {
-                        value: 'fpt_telecom',
-                        label: 'FPT Telecom'
-                    },
-                    {
-                        value: 'fpt_education',
-                        label: 'FPT Education'
-                    }
+                    { value: 'fpt_software',   label: 'FPT Software' },
+                    { value: 'fpt_telecom',    label: 'FPT Telecom' },
+                    { value: 'fpt_education',  label: 'FPT Education' }
                 ],
 
                 relationship_source: [
-                    {
-                        value: 'partner',
-                        label: 'Đối tác'
-                    },
-                    {
-                        value: 'relative',
-                        label: 'Người thân'
-                    }
+                    { value: 'partner',  label: 'Đối tác' },
+                    { value: 'relative', label: 'Người thân' }
+                ],
+
+                // sourceId từ schema.json — Công ty thành viên trong nhánh "Đối tác hoặc người thân FPT"
+                pYpgIJ4BzV6vPH2ttDCu: [
+                    { value: 'cty_a', label: 'Công ty A' },
+                    { value: 'cty_b', label: 'Công ty B' },
+                    { value: 'cty_c', label: 'Công ty C' }
                 ]
             };
 
@@ -96,116 +81,142 @@
         }
 
         /* =========================================================
-           SCHEMA
+           SCHEMA — Boxes format (từ schema.json)
         ========================================================= */
         const schema = [
-
             {
-                variant: 'Text',
-                textType: 'p',
-                content:
-                    'Nếu bạn là thành viên hoặc đối tác của công ty, vui lòng bổ sung thông tin bên dưới.'
-            },
-
-            [
-                {
-                    variant: 'Input',
-                    name: 'first_name',
-                    label: 'Họ',
-                    required: true
-                },
-
-                {
-                    variant: 'Input',
-                    name: 'last_name',
-                    label: 'Tên',
-                    required: true
-                }
-            ],
-
-            {
-                variant: 'Input',
-                name: 'email',
-                label: 'Email',
-                required: true
-            },
-
-            {
-                variant: 'Select',
-                name: 'company',
-                label: 'Công ty thành viên',
-                sourceId: 'company_source',
-                required: true
-            },
-
-            {
-                variant: 'Checkbox',
-                name: 'hobbies',
-                label: 'Sở thích',
-                options: [
-                    'Đọc sách',
-                    'Chạy bộ',
-                    'Du lịch'
-                ]
-            },
-
-            {
-                variant: 'Radio',
-                name: 'member_type',
-                label: 'Thông tin thành viên',
-                radioType: 'component',
-
-                radioOptions: [
+                id: 'box_1',
+                title: 'Bổ sung thông tin',
+                rows: [
                     {
-                        label: 'Nhân viên FPT',
-
-                        components: [
+                        id: 'c_1778640964989_4',
+                        variant: 'Text',
+                        label: 'Description',
+                        rowIndex: 0,
+                        content: 'Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.',
+                        textType: 'p'
+                    },
+                    {
+                        id: 'c_1778640992275_6',
+                        variant: 'Radio',
+                        label: 'Thông tin thành viên',
+                        rowIndex: 1,
+                        name: 'name_9922750005',
+                        description: '',
+                        required: false,
+                        disabled: false,
+                        checked: false,
+                        radioType: 'component',
+                        radioOptions: [
                             {
-                                variant: 'Input',
-                                name: 'employee_code',
-                                label: 'Mã nhân viên',
-                                required: true
-                            },
-
-                            {
-                                variant: 'Select',
-                                name: 'department',
-                                label: 'Phòng ban',
-                                options: [
-                                    'IT',
-                                    'Marketing',
-                                    'Business'
+                                label: 'Thành viên công ty bảo hiểm',
+                                components: [
+                                    {
+                                        id: 'c_1778641031968_8',
+                                        variant: 'Input',
+                                        label: 'Email',
+                                        rowIndex: 0,
+                                        name: 'name_0319680007',
+                                        placeholder: '',
+                                        description: '',
+                                        required: true,
+                                        disabled: false,
+                                        value: ''
+                                    },
+                                    {
+                                        id: 'c_1778641040254_10',
+                                        variant: 'Select',
+                                        label: 'Công ty thành viên',
+                                        rowIndex: 0,
+                                        name: 'name_0402540009',
+                                        placeholder: '',
+                                        description: '',
+                                        required: true,
+                                        disabled: false,
+                                        options: ['Công ty A', 'Công ty B']
+                                    }
                                 ]
+                            },
+                            {
+                                label: 'Đối tác hoặc người thân FPT',
+                                components: [
+                                    {
+                                        id: 'c_1778641288700_12',
+                                        variant: 'Select',
+                                        label: 'Mối quan hệ',
+                                        rowIndex: 0,
+                                        name: 'name_2887000011',
+                                        placeholder: '',
+                                        description: '',
+                                        required: true,
+                                        disabled: false,
+                                        options: ['Đối tác', 'Người thân']
+                                    },
+                                    {
+                                        id: 'c_1778641290192_14',
+                                        variant: 'Select',
+                                        label: 'Công ty thành viên',
+                                        rowIndex: 0,
+                                        name: 'name_2901920013',
+                                        placeholder: '',
+                                        description: '',
+                                        required: false,
+                                        disabled: false,
+                                        options: ['Option 1'],
+                                        sourceId: 'pYpgIJ4BzV6vPH2ttDCu'
+                                    }
+                                ]
+                            },
+                            {
+                                label: 'Khác',
+                                components: []
                             }
                         ]
                     },
-
                     {
-                        label: 'Đối tác hoặc người thân',
-
-                        components: [
-                            {
-                                variant: 'Select',
-                                name: 'relationship',
-                                label: 'Mối quan hệ',
-                                sourceId: 'relationship_source'
-                            },
-
-                            {
-                                variant: 'Input',
-                                name: 'company_name',
-                                label: 'Tên công ty'
-                            }
-                        ]
+                        id: 'c_1779098552905_2',
+                        variant: 'HTML',
+                        label: 'Footer',
+                        rowIndex: 2,
+                        content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a> (nhánh 2), Fanpage vRace để được hỗ trợ.'
                     }
                 ]
             },
-
             {
-                variant: 'HTML',
-
-                content:
-                    'Nếu cần hỗ trợ vui lòng liên hệ <a href="tel:1900633003">1900633003</a>'
+                id: 'box_3',
+                title: 'Điều khoản',
+                rows: [
+                    {
+                        id: 'c_1779263697964_3',
+                        variant: 'Text',
+                        label: 'Mô tả',
+                        rowIndex: 0,
+                        content: 'Nếu bạn là thành viên, đối tác,...của công ty vui lòng bổ sung thông tin để ghi nhận thành tích cho công ty. Bỏ qua nếu bạn là runner tự do.',
+                        textType: 'p'
+                    },
+                    {
+                        id: 'c_1779263720877_5',
+                        variant: 'Checkbox',
+                        label: 'Thông tin điều khoản',
+                        rowIndex: 1,
+                        name: 'name_7208760004',
+                        description: '',
+                        required: true,
+                        disabled: false,
+                        checked: false,
+                        options: [
+                            'Tôi xác nhận tôi từ đủ 18 tuổi trở lên.',
+                            'Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies, Thể lệ Sự Kiện "Giải chạy Trực Tuyến Nestlé Việt Nam" của Nestlé. Tôi đồng ý nhận quà tặng, sản phẩm và các thông tin cập nhật về Sự Kiện từ Nestlé MILO cũng như các nhãn hàng khác của Nestlé và La Vie qua điện thoại, tin nhắn SMS, email.'
+                        ]
+                    },
+                    {
+                        id: 'c_1779263782762_7',
+                        variant: 'HTML',
+                        label: 'New HTML',
+                        rowIndex: 2,
+                        content: 'Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a href="tel:1900633003">1900633003</a> (nhánh 2), Fanpage vRace để được hỗ trợ.'
+                    }
+                ]
             }
         ];
 
@@ -263,7 +274,13 @@
 
                 floatWrap: 'dfb-float-wrap',
 
-                floatFilled: 'dfb-is-filled'
+                floatFilled: 'dfb-is-filled',
+
+                boxWrapper: 'dfb-box',
+
+                boxTitle: 'dfb-box__title',
+
+                boxBody: 'dfb-box__body'
             },
 
             /* =====================================================
@@ -314,25 +331,9 @@
         setTimeout(function () {
 
             renderer.setValues({
-
-                first_name: 'Nguyễn',
-
-                last_name: 'Văn A',
-
-                email: 'vana@example.com',
-
-                company: 'fpt_software',
-
-                hobbies: [
-                    'Đọc sách',
-                    'Du lịch'
-                ],
-
-                member_type: 'Nhân viên FPT',
-
-                employee_code: 'EMP001',
-
-                department: 'IT'
+                name_9922750005: 'Thành viên công ty bảo hiểm',
+                name_0319680007: 'test@example.com',
+                name_0402540009: 'Công ty A'
             });
 
         }, 1000);

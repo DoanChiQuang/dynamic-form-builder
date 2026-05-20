@@ -21,7 +21,10 @@
             checkboxInput: null,
             radioInput: null,
             floatWrap: null,
-            floatFilled: null
+            floatFilled: null,
+            boxWrapper: '',
+            boxTitle: '',
+            boxBody: ''
         },
         bootstrap4: {
             formGroup: 'form-group mb-3',
@@ -42,7 +45,10 @@
             checkboxInput: 'form-check-input',
             radioInput: 'form-check-input',
             floatWrap: null,
-            floatFilled: null
+            floatFilled: null,
+            boxWrapper: '',
+            boxTitle: '',
+            boxBody: ''
         },
         bootstrap5: {
             formGroup: 'mb-3',
@@ -63,7 +69,10 @@
             checkboxInput: 'form-check-input',
             radioInput: 'form-check-input',
             floatWrap: null,
-            floatFilled: null
+            floatFilled: null,
+            boxWrapper: '',
+            boxTitle: '',
+            boxBody: ''
         }
     };
 
@@ -89,7 +98,11 @@
 
         render: function () {
             this.destroy();
-            this._renderRows(this._data);
+            if (this._isBoxesData(this._data)) {
+                this._renderBoxes(this._data);
+            } else {
+                this._renderRows(this._data);
+            }
             this._bindEvents();
             this._rendered = true;
             return this;
@@ -217,9 +230,12 @@
         },
 
         _renderRows: function (data) {
+            this._container.empty();
+            this._renderRowsInto(data, this._container);
+        },
+
+        _renderRowsInto: function (data, $target) {
             var self = this;
-            var $container = this._container;
-            $container.empty();
             data.forEach(function (item) {
                 if (Array.isArray(item)) {
                     var cols = item.length || 1;
@@ -230,10 +246,39 @@
                         $col.append(self._renderComponent(comp));
                         $row.append($col);
                     });
-                    $container.append($row);
+                    $target.append($row);
                 } else {
-                    $container.append(self._renderComponent(item));
+                    $target.append(self._renderComponent(item));
                 }
+            });
+        },
+
+        _isBoxesData: function (data) {
+            return Array.isArray(data) && data.length > 0 &&
+                   data[0] !== null && typeof data[0] === 'object' &&
+                   !Array.isArray(data[0]) && 'rows' in data[0];
+        },
+
+        _renderBoxes: function (data) {
+            var self = this;
+            var cls = this._classes;
+            data.forEach(function (box) {
+                var $box = $('<div>');
+                if (cls.boxWrapper) $box.addClass(cls.boxWrapper);
+                if (box.id) $box.attr('data-box-id', self._escapeHtml(box.id));
+
+                if (box.title) {
+                    var $title = $('<h3>');
+                    if (cls.boxTitle) $title.addClass(cls.boxTitle);
+                    $title.text(box.title);
+                    $box.append($title);
+                }
+
+                var $body = $('<div>');
+                if (cls.boxBody) $body.addClass(cls.boxBody);
+                $box.append($body);
+                self._container.append($box);
+                self._renderRowsInto(box.rows || [], $body);
             });
         },
 
