@@ -8,29 +8,276 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
     <style>
-        /* ===== RESET & BASE ===== */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
+        /* ===== VARIABLES ===== */
+        :root {
+            --vr-primary: #4a80f5;
+            --vr-primary-light: rgba(74, 128, 245, 0.12);
+            --vr-border: #d0d5dd;
+            --vr-border-light: #f2f4f7;
+            --vr-text: #101828;
+            --vr-muted: #667085;
+            --vr-error: #f04438;
+            --vr-radius: 8px;
         }
+
+        /* ===== RESET ===== */
+        *, *::before, *::after { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
-            color: #1a1a1a;
+            color: var(--vr-text);
             background: #f5f5f5;
             margin: 0;
-            padding: 32px 32px;
+            padding: 32px;
+        }
+
+        /* ===== CARD ===== */
+        .form-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px 28px;
+            max-width: 900px;
+            box-shadow: 0 1px 3px rgba(16, 24, 40, .1), 0 1px 2px rgba(16, 24, 40, .06);
+        }
+
+        .form-card__title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--vr-text);
+            margin: 0 0 16px;
+            line-height: 1.4;
+        }
+
+        /* ===== TEXT COMPONENT ===== */
+        .vr-field > p {
+            color: var(--vr-muted);
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0 0 16px;
+        }
+
+        /* ===== FIELD WRAPPER ===== */
+        .vr-field {
+            margin-bottom: 0;
+        }
+
+        /* ===== FLOAT WRAP — container cho floating label ===== */
+        .vr-float-wrap {
+            position: relative;
+        }
+
+        /* ===== INPUT / SELECT ===== */
+        .vr-input {
+            display: block;
+            width: 100%;
+            height: 48px;
+            padding: 18px 14px 6px;
+            border: 1px solid var(--vr-border);
+            border-radius: var(--vr-radius);
+            font-size: 14px;
+            color: var(--vr-text);
+            background: #fff;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+
+        .vr-input:focus {
+            border-color: var(--vr-primary);
+            box-shadow: 0 0 0 3px var(--vr-primary-light);
+        }
+
+        select.vr-input {
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+
+        /* ===== FLOATING LABEL ===== */
+        .vr-float-wrap .vr-label {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--vr-muted);
+            pointer-events: none;
+            margin: 0;
+            line-height: 1;
+            white-space: nowrap;
+            transition: top .15s ease, font-size .15s ease, color .15s ease, transform .15s ease;
+        }
+
+        /* Input: float khi focused */
+        .vr-float-wrap .vr-input:focus ~ .vr-label {
+            top: 7px;
+            transform: none;
+            font-size: 11px;
+            color: var(--vr-primary);
+        }
+
+        /* Input: float khi có giá trị (placeholder=" " trick) */
+        .vr-float-wrap .vr-input:not(:placeholder-shown) ~ .vr-label {
+            top: 7px;
+            transform: none;
+            font-size: 11px;
+            color: var(--vr-muted);
+        }
+
+        /* Input: focused + có giá trị → giữ màu xanh */
+        .vr-float-wrap .vr-input:focus:not(:placeholder-shown) ~ .vr-label {
+            color: var(--vr-primary);
+        }
+
+        /* Select: float khi focused */
+        .vr-float-wrap select.vr-input:focus ~ .vr-label {
+            top: 7px;
+            transform: none;
+            font-size: 11px;
+            color: var(--vr-primary);
+        }
+
+        /* Select: float khi có giá trị (JS toggle vr-is-filled) */
+        .vr-float-wrap.vr-is-filled .vr-label {
+            top: 7px;
+            transform: none;
+            font-size: 11px;
+            color: var(--vr-muted);
+        }
+
+        .vr-float-wrap.vr-is-filled select.vr-input:focus ~ .vr-label {
+            color: var(--vr-primary);
+        }
+
+        /* ===== RADIO GROUP ===== */        
+        .vr-field:has(.vr-radio-item) > .vr-label {
+            display: none;
+        }       
+
+        .vr-radio-item {
+            padding: 14px 0;
+        }
+        
+        .radio-components + .vr-radio-item {
+            border-top: 1px solid var(--vr-border-light);
+        }
+
+        .vr-radio-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--vr-text);
+            line-height: 1.4;
+            user-select: none;
+        }
+
+        /* ===== CUSTOM RADIO BUTTON ===== */
+        .vr-radio-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid var(--vr-border);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            margin: 0;
+            transition: border-color .15s, background-color .15s;
+        }
+
+        .vr-radio-input:checked {
+            border-color: var(--vr-primary);
+            background-color: var(--vr-primary);
+        }
+
+        .vr-radio-input:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: 2px solid #fff;
+            border-left: none;
+            border-top: none;
+            transform: rotate(45deg);
+        }
+
+        /* ===== SUB-COMPONENTS (radio children) ===== */
+        .radio-components {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 12px 0 4px 30px;
+        }
+
+        .radio-components .vr-field {
+            margin: 0;
+        }
+
+        /* ===== HTML COMPONENT (footer) ===== */
+        .formrenderer-html {
+            font-size: 13px;
+            color: var(--vr-muted);
+            line-height: 1.6;
+            margin-top: 4px;
+            padding-top: 16px;
+            border-top: 1px solid var(--vr-border-light);
+        }
+
+        .formrenderer-html a {
+            color: var(--vr-primary);
+            text-decoration: none;
+        }
+
+        .formrenderer-html a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== ERROR STATES ===== */
+        .vr-has-error .vr-input {
+            border-color: var(--vr-error);
+        }
+
+        .vr-invalid {
+            border-color: var(--vr-error) !important;
+            box-shadow: 0 0 0 3px rgba(240, 68, 56, .1) !important;
+        }
+
+        .vr-help {
+            font-size: 12px;
+            color: var(--vr-error);
+            margin-top: 4px;
+        }
+
+        .vr-required {
+            color: var(--vr-error);
+        }
+
+        /* ===== MULTI-COLUMN ROW ===== */
+        .vr-row {
+            display: flex;
+            gap: 16px;
+        }
+
+        .vr-row > [class*="vr-col-"] {
+            flex: 1;
         }
     </style>
 </head>
 
 <body>
     <div class="form-card">
+        <h2 class="form-card__title">Bổ sung thông tin <span class="vr-required">*</span></h2>
         <form action="">
             <div id="container"></div>
         </form>
@@ -135,36 +382,38 @@
                 "variant": "HTML",
                 "label": "Footer",
                 "rowIndex": 2,
-                "content": "Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a class=\"color-link\" href=\"tel:1900633003:2\">1900633003</a> &lpar;nhánh 2&rpar; , Fanpage vRace để được hỗ trợ."
-            }            
+                "content": "Nếu không tìm được thông tin vui lòng liên hệ với BTC qua Hotline: <a class=\"color-link\" href=\"tel:1900633003:2\">1900633003</a> &lpar;nhánh 2&rpar; , Fanpage vRace để được hỗ trợ."
+            }
         ];
 
         /* ── Render ──────────────────────────────────────────────── */
         var renderer = new FormRenderer({
             container: '#container',
             data: schemaArray,
-            // classes: {
-            //     formGroup: 'field-wrap',
-            //     formLabel: 'field-label',
-            //     formControl: 'field-input',
-            //     inputWrapper: null,
-            //     hasError: 'field-error',
-            //     hasSuccess: '',
-            //     isInvalid: 'field-input--invalid',
-            //     helpText: 'field-hint',
-            //     requiredMark: 'required-star',
-            //     row: 'field-row',
-            //     col: 'field-col-{n}',
-            //     checkboxWrapper: 'check-item',
-            //     radioWrapper: 'radio-item',
-            //     checkboxLabel: null,
-            //     radioLabel: null,
-            //     checkboxInput: null,
-            //     radioInput: null
-            // }
+            classes: {
+                formGroup:       'vr-field',
+                formLabel:       'vr-label',
+                formControl:     'vr-input',
+                inputWrapper:    null,
+                hasError:        'vr-has-error',
+                hasSuccess:      '',
+                isInvalid:       'vr-invalid',
+                helpText:        'vr-help',
+                requiredMark:    'vr-required',
+                row:             'vr-row',
+                col:             function(n) { return 'vr-col-' + n; },
+                checkboxWrapper: 'vr-checkbox-item',
+                radioWrapper:    'vr-radio-item',
+                checkboxLabel:   null,
+                radioLabel:      'vr-radio-label',
+                checkboxInput:   null,
+                radioInput:      'vr-radio-input',
+                floatWrap:       'vr-float-wrap',
+                floatFilled:     'vr-is-filled'
+            }
         });
 
-        renderer.render();        
+        renderer.render();
     </script>
 </body>
 

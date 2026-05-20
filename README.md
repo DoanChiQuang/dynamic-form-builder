@@ -13,6 +13,7 @@
 5. [Schema các loại component](#5-schema-các-loại-component)
 6. [Layout nhiều cột](#6-layout-nhiều-cột)
 7. [Tùy chỉnh CSS theo framework](#7-tùy-chỉnh-css-theo-framework)
+   - [7.4 Floating Label (MUI style)](#74-floating-label-mui-style)
 8. [Validation](#8-validation)
 9. [Ví dụ thực tế](#9-ví-dụ-thực-tế)
 
@@ -148,11 +149,24 @@ Mỗi phần tử trong mảng `data` là một object với field `variant` xá
 |-------|----------|-------|
 | `name` | Có | Key trong `getValues()` |
 | `label` | Có | Nhãn hiển thị |
-| `placeholder` | Không | Placeholder |
+| `placeholder` | Không | Placeholder (nếu bỏ trống, mặc định `' '` để hỗ trợ floating label CSS) |
 | `value` | Không | Giá trị mặc định |
 | `required` | Không | Bật validate bắt buộc |
 | `disabled` | Không | Disable field |
 | `description` | Không | Ghi chú bên dưới field |
+
+**DOM được render:**
+```html
+<div class="[formGroup]" data-fr-group="">
+  <div class="vr-float-wrap">
+    <input type="text" class="[formControl]" placeholder=" ">
+    <label class="[formLabel]">Label <span class="[requiredMark]">*</span></label>
+  </div>
+  <p class="[helpText]">description</p>  <!-- nếu có -->
+</div>
+```
+
+> Label nằm **sau** input trong DOM để hỗ trợ CSS selector `input ~ label` cho floating label.
 
 ---
 
@@ -172,6 +186,21 @@ Mỗi phần tử trong mảng `data` là một object với field `variant` xá
     "description": ""
 }
 ```
+
+**DOM được render:**
+```html
+<div class="[formGroup]" data-fr-group="">
+  <div class="vr-float-wrap">           <!-- thêm class vr-is-filled khi có value -->
+    <select class="[formControl]">
+      <option value=""></option>         <!-- option rỗng luôn có với non-multiple select -->
+      <option>...</option>
+    </select>
+    <label class="[formLabel]">Label</label>
+  </div>
+</div>
+```
+
+> `.vr-is-filled` được JS tự động toggle trên `vr-float-wrap` khi select thay đổi giá trị (dùng cho floating label CSS, xem [Mục 7.4](#74-floating-label-mui-style)).
 
 **Select với options tải động** — dùng `sourceId` thay cho `options`:
 
@@ -417,8 +446,84 @@ new FormRenderer({
 | `radioLabel` | `null` | `form-check-label` | `form-check-label` | Class `<label>` trong radio |
 | `checkboxInput` | `null` | `form-check-input` | `form-check-input` | Class bổ sung cho `<input type="checkbox">` |
 | `radioInput` | `null` | `form-check-input` | `form-check-input` | Class bổ sung cho `<input type="radio">` |
+| `floatWrap` | `null` | `null` | `null` | Class div bọc input+label cho floating label. **`null` = layout truyền thống** (label trên input, tương thích Bootstrap). Khi set, label nằm sau input trong wrapper này. |
+| `floatFilled` | `null` | `null` | `null` | Class JS toggle trên `floatWrap` khi select có giá trị. Dùng làm hook CSS để float label lên. `null` = không toggle. |
 
 > Tham chiếu danh sách theme đầy đủ: `FormRenderer.THEMES`
+
+### 7.4 Floating Label (MUI style)
+
+Khi set `classes.floatWrap`, `_renderInput` và `_renderSelect` bọc input/select trong `<div class="[floatWrap]">` và đặt label **sau** element — đây là điều kiện bắt buộc để dùng CSS selector `input ~ label`.
+
+Khi `classes.floatWrap` là `null` (mặc định với mọi Bootstrap theme), cấu trúc truyền thống được dùng: label phía trên input, tương thích hoàn toàn với Bootstrap 3/4/5.
+
+**Kích hoạt** bằng cách set `floatWrap` (và `floatFilled` cho select) trong `classes`:
+```js
+new FormRenderer({
+    container: '#form',
+    data: schema,
+    classes: {
+        floatWrap:   'my-float-wrap',   // tên class tuỳ chọn
+        floatFilled: 'my-filled',       // class JS toggle cho select
+        // ... các key khác
+    }
+});
+```
+
+**Cơ chế cho Input** — thuần CSS, không cần JS. Khi `floatWrap` được set, `placeholder` tự động mặc định là `' '` (space) để `:placeholder-shown` hoạt động:
+```css
+/* Dùng tên class tương ứng với classes.floatWrap */
+.my-float-wrap { position: relative; }
+
+.my-float-wrap .my-label {      /* classes.formLabel */
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    transition: top .15s, font-size .15s, color .15s, transform .15s;
+    pointer-events: none;
+}
+
+/* Float lên khi focused */
+.my-float-wrap .my-input:focus ~ .my-label {
+    top: 7px; transform: none; font-size: 11px; color: #4a80f5;
+}
+
+/* Float lên khi có giá trị — nhờ placeholder=" " (space) */
+.my-float-wrap .my-input:not(:placeholder-shown) ~ .my-label {
+    top: 7px; transform: none; font-size: 11px;
+}
+```
+
+**Cơ chế cho Select** — cần JS vì select không có `:placeholder-shown`.
+
+JS tự động toggle class `classes.floatFilled` trên `floatWrap` mỗi khi giá trị thay đổi (bao gồm cả khi `setValues()` được gọi). `comp.value` set lúc render cũng được xử lý.
+
+```css
+/* Float lên khi focused */
+.my-float-wrap select.my-input:focus ~ .my-label {
+    top: 7px; transform: none; font-size: 11px; color: #4a80f5;
+}
+
+/* Float lên khi có giá trị (JS toggle classes.floatFilled) */
+.my-float-wrap.my-filled .my-label {
+    top: 7px; transform: none; font-size: 11px;
+}
+```
+
+**Input cần `padding-top` đủ lớn** để text không bị che khi label đang float:
+```css
+.my-input {
+    height: 48px;
+    padding: 18px 14px 6px; /* 18px top nhường chỗ cho label float */
+}
+```
+
+**Ẩn label của sub-components bên trong radio** (khi dùng floating label design):
+```css
+.radio-components .my-label { display: none; }
+```
 
 ---
 
@@ -519,6 +624,64 @@ var renderer = new FormRenderer({
 });
 renderer.render();
 ```
+
+### Dùng CSS tùy chỉnh hoàn toàn kèm Floating Label (VRace design)
+
+```html
+<!-- Không cần link Bootstrap -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/path/to/form-renderer.js"></script>
+
+<style>
+:root { --primary: #4a80f5; --border: #d0d5dd; --muted: #667085; }
+
+.vr-float-wrap { position: relative; }
+.vr-input { display:block; width:100%; height:48px; padding:18px 14px 6px;
+            border:1px solid var(--border); border-radius:8px; font-size:14px; outline:none; }
+.vr-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(74,128,245,.12); }
+select.vr-input { appearance:none; /* thêm background-image cho chevron */ }
+
+.vr-float-wrap .vr-label {
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    font-size:14px; color:var(--muted); pointer-events:none;
+    transition: top .15s, font-size .15s, color .15s, transform .15s;
+}
+.vr-float-wrap .vr-input:focus ~ .vr-label,
+.vr-float-wrap .vr-input:not(:placeholder-shown) ~ .vr-label {
+    top:7px; transform:none; font-size:11px;
+}
+.vr-float-wrap .vr-input:focus ~ .vr-label { color:var(--primary); }
+.vr-float-wrap select.vr-input:focus ~ .vr-label,
+.vr-float-wrap.vr-is-filled .vr-label { top:7px; transform:none; font-size:11px; }
+.vr-float-wrap select.vr-input:focus ~ .vr-label { color:var(--primary); }
+</style>
+
+<div id="my-form"></div>
+<script>
+var renderer = new FormRenderer({
+    container: '#my-form',
+    data: schema,
+    classes: {
+        formGroup:    'vr-field',
+        formLabel:    'vr-label',
+        formControl:  'vr-input',
+        inputWrapper: null,
+        hasError:     'vr-has-error',
+        isInvalid:    'vr-invalid',
+        helpText:     'vr-help',
+        requiredMark: 'vr-required',
+        radioWrapper: 'vr-radio-item',
+        radioLabel:   'vr-radio-label',
+        radioInput:   'vr-radio-input',
+        floatWrap:    'vr-float-wrap',    // bật floating label
+        floatFilled:  'vr-is-filled'      // JS hook cho select
+    }
+});
+renderer.render();
+</script>
+```
+
+> `inputWrapper: null` là bắt buộc khi dùng floating label — tránh render thêm div bọc thừa.
 
 ### Re-render khi schema thay đổi
 

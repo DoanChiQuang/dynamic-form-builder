@@ -19,7 +19,9 @@
             checkboxLabel: null,
             radioLabel: null,
             checkboxInput: null,
-            radioInput: null
+            radioInput: null,
+            floatWrap: null,
+            floatFilled: null
         },
         bootstrap4: {
             formGroup: 'form-group mb-3',
@@ -38,7 +40,9 @@
             checkboxLabel: 'form-check-label',
             radioLabel: 'form-check-label',
             checkboxInput: 'form-check-input',
-            radioInput: 'form-check-input'
+            radioInput: 'form-check-input',
+            floatWrap: null,
+            floatFilled: null
         },
         bootstrap5: {
             formGroup: 'mb-3',
@@ -57,7 +61,9 @@
             checkboxLabel: 'form-check-label',
             radioLabel: 'form-check-label',
             checkboxInput: 'form-check-input',
-            radioInput: 'form-check-input'
+            radioInput: 'form-check-input',
+            floatWrap: null,
+            floatFilled: null
         }
     };
 
@@ -247,9 +253,6 @@
             var requiredMark = comp.required ? ' <span class="' + (cls.requiredMark || '') + '">*</span>' : '';
 
             var $group = $('<div>').addClass(cls.formGroup).attr('data-fr-group', '');
-            $group.append(
-                $('<label>').addClass(cls.formLabel).attr('for', this._escapeHtml(id)).html(this._escapeHtml(comp.label) + requiredMark)
-            );
 
             var $input = $('<input type="text">')
                 .addClass(cls.formControl)
@@ -257,22 +260,36 @@
                     id: this._escapeHtml(id),
                     name: this._escapeHtml(comp.name),
                     value: comp.value || '',
-                    placeholder: comp.placeholder || '',
+                    placeholder: comp.placeholder || (cls.floatWrap ? ' ' : ''),
                     'data-required': !!comp.required
                 });
             if (comp.required) $input.attr('required', true);
             if (comp.disabled) $input.attr('disabled', true);
 
-            var $desc = comp.description ? $('<p>').addClass(cls.helpText).text(comp.description) : null;
+            var $label = $('<label>')
+                .addClass(cls.formLabel)
+                .attr('for', this._escapeHtml(id))
+                .html(this._escapeHtml(comp.label) + requiredMark);
 
-            if (cls.inputWrapper) {
-                var $wrapper = $('<div>').addClass(cls.inputWrapper);
-                $wrapper.append($input);
-                if ($desc) $wrapper.append($desc);
-                $group.append($wrapper);
+            if (cls.floatWrap) {
+                var $wrap = $('<div>').addClass(cls.floatWrap);
+                $wrap.append($input).append($label);
+                $group.append($wrap);
+                if (comp.description) {
+                    $group.append($('<p>').addClass(cls.helpText).text(comp.description));
+                }
             } else {
-                $group.append($input);
-                if ($desc) $group.append($desc);
+                $group.append($label);
+                var $desc = comp.description ? $('<p>').addClass(cls.helpText).text(comp.description) : null;
+                if (cls.inputWrapper) {
+                    var $wrapper = $('<div>').addClass(cls.inputWrapper);
+                    $wrapper.append($input);
+                    if ($desc) $wrapper.append($desc);
+                    $group.append($wrapper);
+                } else {
+                    $group.append($input);
+                    if ($desc) $group.append($desc);
+                }
             }
 
             $group.on('input.formrenderer', 'input', function () {
@@ -288,9 +305,6 @@
             var requiredMark = comp.required ? ' <span class="' + (cls.requiredMark || '') + '">*</span>' : '';
 
             var $group = $('<div>').addClass(cls.formGroup).attr('data-fr-group', '');
-            $group.append(
-                $('<label>').addClass(cls.formLabel).attr('for', this._escapeHtml(id)).html(this._escapeHtml(comp.label) + requiredMark)
-            );
 
             var $select = $('<select>')
                 .addClass(cls.formControl)
@@ -303,24 +317,35 @@
             if (comp.disabled) $select.attr('disabled', true);
             if (comp.multiple) $select.attr('multiple', true);
 
-            if (!comp.multiple && comp.placeholder) {
-                $select.append('<option value="">' + this._escapeHtml(comp.placeholder) + '</option>');
+            var $label = $('<label>')
+                .addClass(cls.formLabel)
+                .attr('for', this._escapeHtml(id))
+                .html(this._escapeHtml(comp.label) + requiredMark);
+
+            var $wrap = null;
+            if (cls.floatWrap) {
+                $wrap = $('<div>').addClass(cls.floatWrap);
+                $wrap.append($select).append($label);
+                $group.append($wrap);
+                if (comp.description) {
+                    $group.append($('<p>').addClass(cls.helpText).text(comp.description));
+                }
+            } else {
+                $group.append($label);
+                var $desc = comp.description ? $('<p>').addClass(cls.helpText).text(comp.description) : null;
+                var $inner = cls.inputWrapper ? $('<div>').addClass(cls.inputWrapper) : null;
+                ($inner || $group).append($select);
+                if ($desc) ($inner || $group).append($desc);
+                if ($inner) $group.append($inner);
             }
 
-            var $desc = comp.description ? $('<p>').addClass(cls.helpText).text(comp.description) : null;
-            var $inner = cls.inputWrapper ? $('<div>').addClass(cls.inputWrapper) : null;
-            var $selectTarget = $inner || $group;
-
             if (comp.sourceId && this._loadOptions) {
-                $select.append('<option value="">Loading...</option>').prop('disabled', true);
-                $selectTarget.append($select);
-                if ($desc) $selectTarget.append($desc);
-                if ($inner) $group.append($inner);
+                $select.empty().append('<option value="">Loading...</option>').prop('disabled', true);
 
                 this._loadOptions(comp.sourceId, function (options) {
-                    $select.find('option').remove().end().prop('disabled', !!comp.disabled);
-                    if (!comp.multiple && comp.placeholder) {
-                        $select.append('<option value="">' + self._escapeHtml(comp.placeholder) + '</option>');
+                    $select.empty().prop('disabled', !!comp.disabled);
+                    if (!comp.multiple) {
+                        $select.append('<option value="">' + (comp.placeholder ? self._escapeHtml(comp.placeholder) : '') + '</option>');
                     }
                     if (options && options.length) {
                         options.forEach(function (opt) {
@@ -331,21 +356,30 @@
                             }
                         });
                     }
-                    if (comp.value) $select.val(comp.value);
+                    if (comp.value) {
+                        $select.val(comp.value);
+                        if ($wrap && cls.floatFilled) $wrap.toggleClass(cls.floatFilled, !!$select.val());
+                    }
                 });
             } else {
+                if (!comp.multiple && cls.floatWrap) {
+                    $select.append('<option value="">' + (comp.placeholder ? this._escapeHtml(comp.placeholder) : '') + '</option>');
+                } else if (!comp.multiple && comp.placeholder) {
+                    $select.append('<option value="">' + this._escapeHtml(comp.placeholder) + '</option>');
+                }
                 if (comp.options && comp.options.length) {
                     comp.options.forEach(function (opt) {
                         $select.append('<option value="' + self._escapeHtml(opt) + '">' + self._escapeHtml(opt) + '</option>');
                     });
                 }
-                $selectTarget.append($select);
-                if ($desc) $selectTarget.append($desc);
-                if ($inner) $group.append($inner);
-                if (comp.value) $select.val(comp.value);
+                if (comp.value) {
+                    $select.val(comp.value);
+                    if ($wrap && cls.floatFilled) $wrap.toggleClass(cls.floatFilled, !!$select.val());
+                }
             }
 
             $group.on('change.formrenderer', 'select[name="' + comp.name + '"]', function () {
+                if ($wrap && cls.floatFilled) $wrap.toggleClass(cls.floatFilled, !!$(this).val());
                 if (self._onChange) self._onChange(comp.name, $(this).val(), comp);
             });
             return $group;
