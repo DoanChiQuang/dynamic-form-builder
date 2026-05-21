@@ -471,7 +471,11 @@
                     if (cls.checkboxInput) $input.addClass(cls.checkboxInput);
                     if (comp.checked) $input.prop('checked', true);
                     if (comp.disabled) $input.attr('disabled', true);
-                    $checkLabel.append($input).append(' ' + self._escapeHtml(optLabel));
+                    if (comp.htmlLabels) {
+                        $checkLabel.append($input).append($('<span>').html(' ' + optLabel));
+                    } else {
+                        $checkLabel.append($input).append(' ' + self._escapeHtml(optLabel));
+                    }
                     $checkDiv.append($checkLabel);
                     $group.append($checkDiv);
                 });
